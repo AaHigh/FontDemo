@@ -1,0 +1,15 @@
+varying vec2 texture_coordinate;
+varying vec4 color1;
+varying vec4 color2;
+
+void main()
+{
+	// Transforming The Vertex
+    color1 = gl_Color;
+	color2 = gl_SecondaryColor;
+    color2.w = color1.w;
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+	// Passing The Texture Coordinate Of Texture Unit 0 To The Fragment Shader
+	texture_coordinate = vec2(gl_MultiTexCoord0);
+}

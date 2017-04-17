@@ -1,0 +1,45 @@
+const float Eta = 0.66;         // Ratio of indices of refraction
+
+uniform vec3 LightPosition;
+
+varying vec4 color1;
+varying vec4 color2;
+
+varying vec4 diffuse;
+varying vec4 ambient;
+
+varying vec3  vTexCoord;
+varying vec2  tc;
+varying float LightIntensity;
+varying vec3  normal;
+varying vec3  lightDir;
+varying vec3  halfVector;
+
+void main()
+{
+	normal     = normalize( gl_NormalMatrix * gl_Normal );
+	lightDir   = normalize( vec3( -gl_LightSource[0].position ) );
+	halfVector = normalize( gl_LightSource[0].halfVector.xyz );
+
+//	diffuse = gl_FrontMaterial.diffuse * gl_LightSource[0].diffuse;
+//	ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
+	diffuse = gl_LightSource[0].diffuse;
+	ambient = gl_LightSource[0].ambient;
+	ambient += gl_LightModel.ambient * gl_FrontMaterial.ambient;
+
+	color1 = gl_Color;
+	color2 = gl_SecondaryColor;
+
+	vec4 ecPosition  = gl_ModelViewMatrix * gl_Vertex;
+	vec3 ecPosition3 = ecPosition.xyz;
+	vec3 lightVec    = normalize( LightPosition - ecPosition3 );
+
+	vec3 i      = normalize( ecPosition3 );
+	vTexCoord   = refract( i, normal, Eta );
+	vTexCoord   = vec3( gl_TextureMatrixInverse[0] * vec4(vTexCoord, 1.0 ) );
+	
+	tc = vec2( gl_TextureMatrix[1] * gl_Vertex );
+
+
+	gl_Position = ftransform();
+}
